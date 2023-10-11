@@ -61,3 +61,47 @@ function StatusCheck(status,time) {
     }
 
 }
+
+
+document.addEventListener("DOMContentLoaded", function () {
+    const dataSelector = document.getElementById("dataSelector");
+    const displayContainer = document.getElementById("displayContainer");
+    displayData("neabht")
+
+    dataSelector.addEventListener("click", () => {
+        const selectedData = dataSelector.value;
+        displayData(selectedData);
+    });
+
+    function displayData(selectedData) {
+        fetch("https://results.bimal1412.com.np/neaposts/")
+            .then(response => response.json())
+            .then(data => {
+                const selectedArray = data.find(item => item[selectedData]);
+                if (selectedArray) {
+                    const dataArray = selectedArray[selectedData];
+                    const displayHTML = dataArray.map(item => `
+                        <div class="p-1 col-sm-6">
+                            <div class="card">
+                                <div class="card-body">
+                                    <h5 class="card-title">${item.id}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">${new Date(item.time * 1000).toLocaleString()}</h6>
+                                    <p class="card-text">${item.text}</p>
+                                    <a href="${item.images}" class="card-link">Images</a>
+                                    <a href="${item.url}" class="card-link">Post Link</a>
+                                </div>
+                            </div>
+                        </div>
+                    `).join("");
+    
+                    displayContainer.innerHTML = displayHTML;
+                } else {
+                    displayContainer.innerHTML = "<p>No data found.</p>";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching data: " + error);
+            });
+    }
+    
+});
