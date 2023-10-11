@@ -9,7 +9,10 @@ async function logMovies() {
     const movies = await response.json();
     const elec = await movies["current_status"]
     const last_online = await movies["last_online"];
-    StatusCheck(elec,last_online);
+    function repeat() {
+        StatusCheck(elec,last_online);
+    } 
+    setInterval(repeat, 1000);
     console.log(last_online);
  }
 
