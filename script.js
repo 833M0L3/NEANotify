@@ -90,8 +90,8 @@ document.addEventListener("DOMContentLoaded", function () {
                                     <h5 class="card-title">${item.id}</h5>
                                     <h6 class="card-subtitle mb-2 text-muted">${new Date(item.time * 1000).toLocaleString()}</h6>
                                     <p class="card-text">${item.text}</p>
-                                    <a href="${item.images}" class="card-link">Images</a>
-                                    <a href="${item.url}" class="card-link">Post Link</a>
+                                    <a href="${item.images ? item.images : '#'}" class="card-link">Images</a>
+                                    <a href="${item.url ? item.url : '#'}" class="card-link">Post Link</a>
                                 </div>
                             </div>
                         </div>
