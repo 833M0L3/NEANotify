@@ -4,7 +4,19 @@ const data1 = document.getElementById("online")
 const button1 = document.getElementById("button")
 const status1 = document.getElementById("status")
 const outagehrs = document.getElementById("outagehrs")
-const outagelist = document.getElementById("outagedates")
+const outagecount = document.getElementById("outagecount")
+
+
+function FormatDate() {
+    const today = new Date();
+   const year = today.getFullYear();
+   const month = String(today.getMonth() + 1).padStart(2, '0');
+   const day = String(today.getDate()).padStart(2, '0');
+
+   const formattedDate = `${year}-${month}-${day}`;
+
+   return formattedDate
+}
 
 async function logMovies() {
     const response = await fetch("https://results.bimal1412.com.np/nea");
@@ -115,6 +127,16 @@ function processData(data){
     const collectionDate = {};
     const dateslist = [];
     const outageByDate = {};
+    const groupedByDate = {};
+    data.outage_dates.forEach(timestamp => {
+        const date = timestamp.split(" ")[0]; 
+    
+        if (groupedByDate[date]) {
+            groupedByDate[date].push(timestamp);
+        } else {
+            groupedByDate[date] = [timestamp];
+        }
+    });
             for (let i = 0; i < data.outage_dates.length; i++) {
                 const date = data.outage_dates[i].split(" ")[0];
                 const outageHourParts = data.outage_hrs[i].match(/(\d+) hours, (\d+) minutes, (\d+) seconds/);
@@ -122,7 +144,6 @@ function processData(data){
                 const hours = parseInt(outageHourParts[1], 10);
                 const minutes = parseInt(outageHourParts[2], 10);
                 const seconds = parseInt(outageHourParts[3], 10);
-
                 if (outageByDate[date]) {
                     outageByDate[date].hours += hours;
                     outageByDate[date].minutes += minutes;
@@ -160,7 +181,10 @@ function processData(data){
                 
             }
     const sortedDates = Object.keys(collectionDate).sort((a, b) => new Date(b) - new Date(a));        
-    Graph(collectionDate,sortedDates,dateslist);
+    Graph(collectionDate,sortedDates,dateslist,groupedByDate);
+    days = Object.keys(groupedByDate[FormatDate()]).length
+    outagecount.innerText = "Outage Today : " + days + " Times"
+    
  }
 
  async function DifferenceHrs() {
@@ -184,14 +208,17 @@ const outageData = {
 
 DifferenceHrs();
 
+const outageCounts = {};
+
 const ctx = document.getElementById('outageChart').getContext('2d');
 const MAX_ENTRIES = 7;
-function Graph(outageByDate,sortedDates,dateslist) {
-
+function Graph(outageByDate,sortedDates,dateslist,groupedByDate) {
     for (let i = 0; i < Math.min(MAX_ENTRIES, sortedDates.length); i++) {
         const date = sortedDates[i];
         const list = dateslist[i]
-        outageData.labels.push(`${date} : ${list}`);
+        const outageCount = Object.keys(groupedByDate[date]).length;
+        outageCounts[date] = outageCount;
+        outageData.labels.push(`${date} : ${list} , ${outageCount} outages`);
     
         let { hours, minutes, seconds } = outageByDate[date];
     
@@ -214,4 +241,5 @@ function Graph(outageByDate,sortedDates,dateslist) {
             },
         },
     });
+
 }
