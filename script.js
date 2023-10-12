@@ -3,6 +3,7 @@ console.log("Hello world")
 const data1 = document.getElementById("online")
 const button1 = document.getElementById("button")
 const status1 = document.getElementById("status")
+const outagehrs = document.getElementById("outagehrs")
 
 async function logMovies() {
     const response = await fetch("https://results.bimal1412.com.np/nea");
@@ -110,6 +111,7 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 function processData(data){
+    const collectionDate = {}
     const outageByDate = {};
             for (let i = 0; i < data.outage_dates.length; i++) {
                 const date = data.outage_dates[i].split(" ")[0];
@@ -145,27 +147,67 @@ function processData(data){
                 if (seconds > 0 && hours === 0 && minutes === 0) {
                     outageTime += `${seconds} sec`;
                 }
-
+                collectionDate[date] = { hours, minutes, seconds };
                 const targetDate = new Date(date);
                 const currentDate = new Date();
                 const isMatchingDate = targetDate.toDateString() === currentDate.toDateString();
                 if (isMatchingDate) {
                     outagehrs.innerText = "Total Outage Today : " + outageTime
                 }
-                else {
-                    console.log(`Date: ${date}, Outage Time: ${outageTime}`);
-                }
                 
             }
-
+    const sortedDates = Object.keys(collectionDate).sort((a, b) => new Date(b) - new Date(a));        
+    Graph(collectionDate,sortedDates);
  }
 
  async function DifferenceHrs() {
     const response = await fetch("https://results.bimal1412.com.np/neadates");
     const hrsdata = await response.json();
-    processData(hrsdata);
-    
+    processData(hrsdata)
  }
 
 
+const outageData = {
+    labels: [],
+    datasets: [
+        {
+            label: 'Outage Hours',
+            data: [], 
+            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+            borderWidth: 1,
+        },
+    ],
+};
+
 DifferenceHrs();
+
+const ctx = document.getElementById('outageChart').getContext('2d');
+const MAX_ENTRIES = 7;
+function Graph(outageByDate,sortedDates) {
+
+    for (let i = 0; i < Math.min(MAX_ENTRIES, sortedDates.length); i++) {
+        const date = sortedDates[i];
+        outageData.labels.push(date);
+    
+        let { hours, minutes, seconds } = outageByDate[date];
+    
+        minutes += Math.floor(seconds / 60);
+        seconds %= 60;
+        hours += Math.floor(minutes / 60);
+        minutes %= 60;
+    
+        outageData.datasets[0].data.push(hours + minutes / 60);
+    }
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: outageData,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                },
+            },
+        },
+    });
+}
