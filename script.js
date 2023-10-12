@@ -108,3 +108,64 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
 });
+
+function processData(data){
+    const outageByDate = {};
+            for (let i = 0; i < data.outage_dates.length; i++) {
+                const date = data.outage_dates[i].split(" ")[0];
+                const outageHourParts = data.outage_hrs[i].match(/(\d+) hours, (\d+) minutes, (\d+) seconds/);
+
+                const hours = parseInt(outageHourParts[1], 10);
+                const minutes = parseInt(outageHourParts[2], 10);
+                const seconds = parseInt(outageHourParts[3], 10);
+
+                if (outageByDate[date]) {
+                    outageByDate[date].hours += hours;
+                    outageByDate[date].minutes += minutes;
+                    outageByDate[date].seconds += seconds;
+                } else {
+                    outageByDate[date] = { hours, minutes, seconds };
+                }
+            }
+            for (const date in outageByDate) {
+                let { hours, minutes, seconds } = outageByDate[date];
+
+                minutes += Math.floor(seconds / 60);
+                seconds %= 60;
+                hours += Math.floor(minutes / 60);
+                minutes %= 60;
+
+                let outageTime = "";
+                if (hours > 0) {
+                    outageTime += `${hours} hrs `;
+                }
+                if (minutes > 0) {
+                    outageTime += `${minutes} min `;
+                }
+                if (seconds > 0 && hours === 0 && minutes === 0) {
+                    outageTime += `${seconds} sec`;
+                }
+
+                const targetDate = new Date(date);
+                const currentDate = new Date();
+                const isMatchingDate = targetDate.toDateString() === currentDate.toDateString();
+                if (isMatchingDate) {
+                    outagehrs.innerText = "Total Outage Today : " + outageTime
+                }
+                else {
+                    console.log(`Date: ${date}, Outage Time: ${outageTime}`);
+                }
+                
+            }
+
+ }
+
+ async function DifferenceHrs() {
+    const response = await fetch("https://results.bimal1412.com.np/neadates");
+    const hrsdata = await response.json();
+    processData(hrsdata);
+    
+ }
+
+
+DifferenceHrs();
