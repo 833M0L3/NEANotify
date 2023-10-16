@@ -150,6 +150,7 @@ function processData(data){
                     outageByDate[date] = { hours, minutes, seconds };
                 }
             }
+            outagehrs.innerText = "No Outage Today"
             for (const date in outageByDate) {
                 let { hours, minutes, seconds } = outageByDate[date];
 
@@ -176,10 +177,7 @@ function processData(data){
                 if (isMatchingDate) {
                     outagehrs.innerText = "Total Outage Today : " + outageTime
                 }
-                else {
-                    outagehrs.innerText = "No Outage Today"
-                }
-                
+
             }
     const sortedDates = Object.keys(collectionDate).sort((a, b) => new Date(b) - new Date(a));        
     Graph(collectionDate,sortedDates,dateslist,groupedByDate);
