@@ -1,5 +1,3 @@
-console.log("Hello world")
-
 const data1 = document.getElementById("online")
 const button1 = document.getElementById("button")
 const status1 = document.getElementById("status")
@@ -18,11 +16,11 @@ function FormatDate() {
    return formattedDate
 }
 
-async function logMovies() {
+async function fetchStatus() {
     const response = await fetch("https://results.bimal1412.com.np/nea");
-    const movies = await response.json();
-    const elec = await movies["current_status"]
-    const last_online = await movies["last_online"];
+    const neastatus = await response.json();
+    const elec = await neastatus["current_status"]
+    const last_online = await neastatus["last_online"];
     function repeat() {
         StatusCheck(elec,last_online);
     } 
@@ -30,7 +28,7 @@ async function logMovies() {
     console.log(last_online);
  }
 
-logMovies()
+fetchStatus()
 
 function TimeDifference(specificDateStr) {
     var specificDate = new Date(specificDateStr);
@@ -177,6 +175,9 @@ function processData(data){
                 dateslist.push(outageTime);
                 if (isMatchingDate) {
                     outagehrs.innerText = "Total Outage Today : " + outageTime
+                }
+                else {
+                    outagehrs.innerText = "No Outage Today"
                 }
                 
             }
