@@ -239,7 +239,7 @@ function Graph(outageByDate,sortedDates,dateslist,groupedByDate) {
                 },
                 x: {
                     ticks: {
-                        display: window.screen.width > 1000
+                        display: window.innerWidth > 800
                     }
                 }
             },
