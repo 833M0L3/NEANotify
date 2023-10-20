@@ -237,6 +237,11 @@ function Graph(outageByDate,sortedDates,dateslist,groupedByDate) {
                 y: {
                     beginAtZero: true,
                 },
+                x: {
+                    ticks: {
+                        display: window.screen.width > 400
+                    }
+                }
             },
         },
     });
